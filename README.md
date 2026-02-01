@@ -52,34 +52,84 @@ cd PayTrack
 npm install
 ```
 
-### 3. Configuración de Variables de Entorno (Firebase)
+### 3. Configuración Detallada de Firebase
 
-Para que la aplicación funcione, es necesario conectarla a un proyecto de Firebase.
+Este proyecto requiere servicios de Firebase (Google) para funcionar. Sigue esta guía paso a paso si es tu primera vez:
 
-1.  Crea un proyecto gratuito en [Firebase Console](https://console.firebase.google.com/).
-2.  Registra una "App Web" dentro del proyecto.
-3.  Copia las credenciales de configuración.
-4.  Crea/Modifica el archivo `src/config/firebase.js` y añade tus claves:
+#### Paso 3.1: Crear el Proyecto
+1.  Accede a la [Consola de Firebase](https://console.firebase.google.com/) e inicia sesión con tu cuenta de Google.
+2.  Haz clic en el cuadro grande que dice **"Crear un proyecto"** (o "Agregar proyecto").
+3.  Escribe el nombre del proyecto: **PayTrack**.
+4.  Desactiva la opción *Google Analytics* (no es necesaria para este proyecto) y haz clic en **Crear proyecto**.
+5.  Espera a que termine y pulsa **Continuar**.
+
+#### Paso 3.2: Registrar la Aplicación Web
+1.  En la pantalla principal de tu nuevo proyecto, verás varios iconos circulares bajo el título *"Comenza por agregar Firebase a tu app"*.
+2.  Haz clic en el icono **Web** (el que parece un símbolo de código `</>`).
+3.  En "Apodo de la app", escribe: `paytrack-web`.
+4.  No marques la casilla de "Firebase Hosting" (lo haremos más tarde).
+5.  Haz clic en **Registrar app**.
+6.  Aparecerá un bloque de código con `const firebaseConfig = { ... }`. **Copia este bloque**, lo necesitarás en el paso 3.5.
+7.  Haz clic en **Ir a la consola**.
+
+#### Paso 3.3: Habilitar Autenticación
+1.  En el menú lateral izquierdo, haz clic en **Compilación** (Build) > **Authentication**.
+2.  Haz clic en el botón **Comenzar**.
+3.  En la pestaña *Sign-in method* (Métodos de inicio de sesión), selecciona **Correo electrónico/contraseña**.
+    *   Habilita el interruptor "Correo electrónico/contraseña".
+    *   Deja desactivado "Vínculo del correo electrónico".
+    *   Haz clic en **Guardar**.
+4.  Haz clic en **Agregar proveedor nuevo** y selecciona **Google**.
+    *   Habilita el interruptor.
+    *   Escribe un nombre para el proyecto (ej: PayTrack).
+    *   Selecciona tu correo en el desplegable de "Correo electrónico de asistencia".
+    *   Haz clic en **Guardar**.
+
+#### Paso 3.4: Habilitar Base de Datos (Firestore)
+1.  En el menú lateral, ve a **Compilación** > **Firestore Database**.
+2.  Haz clic en **Crear base de datos**.
+3.  Selecciona una ubicación (Ubicación del servidor). Elige la más cercana a ti (ej: `eur3` para Europa).
+4.  En las reglas de seguridad, selecciona **Comenzar en modo de producción**.
+5.  Haz clic en **Crear** / **Habilitar**.
+6.  Una vez creada, ve a la pestaña **Reglas** (arriba).
+7.  Borra todo el contenido y pega el siguiente código para asegurar la privacidad de los datos:
 
 ```javascript
-// src/config/firebase.js
-import { initializeApp } from 'firebase/app';
-// ... otros imports
-
-const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_PROYECTO.firebaseapp.com",
-  projectId: "TU_PROJECT_ID",
-  storageBucket: "TU_PROYECTO.appspot.com",
-  messagingSenderId: "TU_SENDER_ID",
-  appId: "TU_APP_ID"
-};
-
-const app = initializeApp(firebaseConfig);
-// ... exportaciones
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // El usuario solo puede leer/escribir sus propia configuración de deuda
+    match /debts/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // El usuario solo puede leer/escribir sus propios pagos
+    match /payments/{paymentId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+  }
+}
 ```
+8.  Haz clic en **Publicar**.
 
-> **Nota para el evaluación**: Asegúrate de habilitar **Authentication** (Email/Google) y **Firestore Database** en la consola de Firebase.
+#### Paso 3.5: Configurar el Archivo Local
+1.  En el código del proyecto (en tu ordenador), navega a la carpeta `src/config/`.
+2.  Abre el archivo `firebase.js`.
+3.  Busca la sección `const firebaseConfig = { ... }` y reemplázala con el objeto que copiaste en el Paso 3.2.
+
+Debería verse similar a esto (pero con tus claves):
+
+```javascript
+const firebaseConfig = {
+  apiKey: "AIzaSyD...",
+  authDomain: "paytrack-12345.firebaseapp.com",
+  projectId: "paytrack-12345",
+  storageBucket: "paytrack-12345.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abcdef"
+};
+```
 
 ### 4. Ejecutar en Entorno de Desarrollo
 
