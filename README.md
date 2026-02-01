@@ -1,187 +1,120 @@
-# Payment Tracker - Aplicación de Gestión de Pagos
+# PayTrack - Plataforma de Gestión y Seguimiento de Pagos
 
-Aplicación web moderna para seguimiento y gestión de pagos de deudas con autenticación de usuarios, visualización de progreso y generación de informes en PDF.
+**PayTrack** es una aplicación web progresiva (PWA) diseñada para facilitar el control financiero personal, específicamente orientada a la gestión y amortización de deudas o pagos recurrentes. Este proyecto ha sido desarrollado como parte de un Trabajo de Fin de Grado (TFG), demostrando el uso de arquitecturas modernas en el desarrollo web.
 
-## 🚀 Características
+## 📌 Descripción del Proyecto
 
-- ✅ **Autenticación** - Email/Contraseña y Google OAuth
-- 💰 **Gestión de Deudas** - Configurar monto total y cuota por defecto
-- 📊 **Visualización** - Gráfico de progreso en tiempo real
-- 💸 **Registro de Pagos** - Añadir transferencias con concepto opcional
-- 📋 **Historial** - Lista de pagos con búsqueda y ordenación
-- 📄 **Informes PDF** - Generación de informes descargables
-- 🎨 **Diseño Moderno** - UI atractiva con animaciones suaves
-- 📱 **Responsive** - Compatible con móviles, tablets y desktop
+El objetivo principal de PayTrack es proporcionar una interfaz intuitiva y visual para que los usuarios puedan realizar un seguimiento exhaustivo de sus obligaciones financieras. La aplicación permite establecer objetivos de pago, visualizar el progreso mediante gráficos interactivos en tiempo real y generar informes detallados para constancia documental.
 
-## 📋 Requisitos Previos
+### Características Principales
 
-- Node.js (v18 o superior)
-- npm o yarn
-- Cuenta de Firebase (gratuita)
+*   **Autenticación Segura**: Sistema de registro e inicio de sesión mediante Email/Contraseña y proveedor externo (Google Account), garantizando la privacidad de los datos.
+*   **Gestión de Deuda**: Configuración personalizada del monto total a amortizar y establecimiento de cuotas mensuales por defecto.
+*   **Visualización de Datos**: Dashboard interactivo con gráficos de progreso que muestran el estado actual de la amortización (pagado vs. pendiente) y porcentajes de cumplimiento.
+*   **Historial Transaccional**: Registro detallado de cada pago realizado, con opción de incluir conceptos y fechas automáticas.
+*   **Informes y Exportación**: Generación de informes en formato PDF con el resumen de la deuda y el histórico de pagos, listos para descargar o compartir.
+*   **Experiencia de Usuario (UX)**: Diseño *responsive* adaptado a dispositivos móviles y escritorio, con feedback visual y animaciones suaves.
 
-## 🔧 Configuración
+## 🛠️ Stack Tecnológico
 
-### 1. Instalar Dependencias
+El desarrollo de este proyecto se ha basado en un stack tecnológico actual, priorizando el rendimiento, la escalabilidad y la experiencia de desarrollo.
+
+*   **Frontend**: React 18 (Biblioteca UI), Vite (Entorno de desarrollo y construcción).
+*   **Backend & Cloud**: Firebase (Backend-as-a-Service).
+    *   *Authentication*: Gestión de identidades.
+    *   *Firestore Database*: Base de datos NoSQL en tiempo real.
+    *   *Hosting*: Despliegue y distribución de contenido estático.
+*   **Visualización**: Recharts (Gráficos composables).
+*   **Utilidades**: jsPDF (Generación de documentos), date-fns (Manipulación de fechas).
+
+## 📋 Requisitos de Instalación
+
+Para ejecutar este proyecto en un entorno local, se requiere:
+
+*   **Node.js**: Versión 18.0.0 o superior.
+*   **Gestor de Paquetes**: npm (incluido con Node.js) o yarn.
+*   **Git**: Para el control de versiones.
+
+## 🚀 Guía de Puesta en Marcha
+
+Sigue estos pasos para desplegar el proyecto en tu máquina local:
+
+### 1. Clonar el Repositorio
 
 ```bash
-cd payment-tracker
+git clone https://github.com/camu740/PayTrack.git
+cd PayTrack
+```
+
+### 2. Instalar Dependencias
+
+```bash
 npm install
 ```
 
-### 2. Configurar Firebase
+### 3. Configuración de Variables de Entorno (Firebase)
 
-#### Paso 1: Crear Proyecto en Firebase
+Para que la aplicación funcione, es necesario conectarla a un proyecto de Firebase.
 
-1. Ve a [Firebase Console](https://console.firebase.google.com/)
-2. Haz clic en "Agregar proyecto"
-3. Nombra tu proyecto (ej: "payment-tracker")
-4. Deshabilita Google Analytics si no lo necesitas
-5. Haz clic en "Crear proyecto"
-
-#### Paso 2: Configurar Authentication
-
-1. En el panel izquierdo, ve a **Build** > **Authentication**
-2. Haz clic en "Get started"
-3. Habilita los siguientes proveedores:
-   - **Email/Password**: Actívalo
-   - **Google**: Actívalo (configura el correo del proyecto)
-
-#### Paso 3: Configurar Firestore Database
-
-1. En el panel izquierdo, ve a **Build** > **Firestore Database**
-2. Haz clic en "Create database"
-3. Selecciona "Start in **production mode**" (cambiaremos las reglas después)
-4. Elige la región más cercana
-5. Haz clic en "Enable"
-
-#### Paso 4: Configurar Reglas de Seguridad
-
-En la pestaña "Rules" de Firestore, reemplaza las reglas con:
+1.  Crea un proyecto gratuito en [Firebase Console](https://console.firebase.google.com/).
+2.  Registra una "App Web" dentro del proyecto.
+3.  Copia las credenciales de configuración.
+4.  Crea/Modifica el archivo `src/config/firebase.js` y añade tus claves:
 
 ```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    // Allow users to read/write their own debt configuration
-    match /debts/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-    
-    // Allow users to read/write their own payments
-    match /payments/{paymentId} {
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
-    }
-  }
-}
-```
+// src/config/firebase.js
+import { initializeApp } from 'firebase/app';
+// ... otros imports
 
-Haz clic en "Publish" para guardar.
-
-#### Paso 5: Obtener Credenciales
-
-1. Ve a **Project Settings** (⚙️ en el panel izquierdo)
-2. En la sección "Your apps", haz clic en el icono web `</>`
-3. Registra tu app (puedes llamarla "payment-tracker-web")
-4. Copia el objeto `firebaseConfig` que aparece
-
-#### Paso 6: Configurar la Aplicación
-
-1. Abre el archivo `src/config/firebase.js`
-2. Reemplaza las credenciales con las tuyas:
-
-```javascript
 const firebaseConfig = {
   apiKey: "TU_API_KEY",
-  authDomain: "TU_PROJECT_ID.firebaseapp.com",
+  authDomain: "TU_PROYECTO.firebaseapp.com",
   projectId: "TU_PROJECT_ID",
-  storageBucket: "TU_PROJECT_ID.appspot.com",
-  messagingSenderId: "TU_MESSAGING_SENDER_ID",
+  storageBucket: "TU_PROYECTO.appspot.com",
+  messagingSenderId: "TU_SENDER_ID",
   appId: "TU_APP_ID"
 };
+
+const app = initializeApp(firebaseConfig);
+// ... exportaciones
 ```
 
-## 🚀 Ejecutar la Aplicación
+> **Nota para el evaluación**: Asegúrate de habilitar **Authentication** (Email/Google) y **Firestore Database** en la consola de Firebase.
+
+### 4. Ejecutar en Entorno de Desarrollo
 
 ```bash
 npm run dev
 ```
 
-La aplicación estará disponible en `http://localhost:5173`
+La aplicación estará accesible en: `http://localhost:5173`
 
-## 📖 Uso
+## 📦 Construcción y Despliegue
 
-### Primera Vez
+Para generar una versión optimizada para producción:
 
-1. **Registrarse** - Crea una cuenta con email/contraseña o Google
-2. **Configurar Deuda** - Ingresa el monto total y la cuota por defecto
-3. **Añadir Pagos** - Registra tus transferencias
-4. **Ver Progreso** - Visualiza tu progreso en el gráfico
-5. **Generar Informe** - Descarga un PDF con el resumen
-
-### Funcionalidades Clave
-
-- **Modificar Cuota**: Actualiza la cuota por defecto en cualquier momento
-- **Búsqueda**: Busca transferencias por concepto
-- **Ordenación**: Ordena por fecha o importe
-- **Auto-ajuste**: La cuota se ajusta automáticamente cuando queda menos dinero que la cuota configurada
-
-## 🏗️ Estructura del Proyecto
-
-```
-payment-tracker/
-├── src/
-│   ├── components/
-│   │   ├── Auth/          # Login y Register
-│   │   ├── Dashboard/     # Dashboard principal
-│   │   ├── PaymentChart/  # Gráfico de progreso
-│   │   ├── PaymentForm/   # Formulario de pagos
-│   │   └── PaymentList/   # Lista de transferencias
-│   ├── config/
-│   │   └── firebase.js    # Configuración de Firebase
-│   ├── context/
-│   │   └── AuthContext.jsx # Context de autenticación
-│   ├── services/
-│   │   ├── authService.js    # Servicios de auth
-│   │   ├── debtService.js    # Servicios de deuda
-│   │   └── paymentService.js # Servicios de pagos
-│   ├── utils/
-│   │   └── pdfGenerator.js   # Generador de PDFs
-│   ├── App.jsx
-│   ├── main.jsx
-│   └── index.css
-└── package.json
+```bash
+npm run build
 ```
 
-## 🛠️ Tecnologías Utilizadas
+Esto generará la carpeta `dist/` con los archivos estáticos listos para ser servidos.
 
-- **React 18** - Framework UI
-- **Vite** - Build tool
-- **Firebase** - Backend (Auth + Firestore)
-- **React Router** - Navegación
-- **Recharts** - Gráficos
-- **jsPDF** - Generación de PDFs
-- **date-fns** - Manejo de fechas
+Para desplegar directamente a Firebase Hosting (si tienes Firebase CLI instalado):
 
-## 📱 Compatibilidad
+```bash
+firebase deploy
+```
 
-- ✅ Chrome (recomendado)
-- ✅ Safari
-- ✅ Firefox
-- ✅ Edge
-- ✅ Móviles (iOS/Android)
+## 🔐 Seguridad y Privacidad
 
-## 🔒 Seguridad
+Este proyecto implementa reglas de seguridad en nivel de base de datos (Firestore Security Rules) para asegurar que:
+*   Un usuario **solo puede leer y escribir sus propios datos**.
+*   No existe acceso cruzado entre cuentas.
+*   Se validan los tipos de datos en la entrada.
 
-- Autenticación segura con Firebase
-- Reglas de seguridad en Firestore
-- Datos privados por usuario
-- No se comparte información entre usuarios
+## 👤 Autor
 
-## 📄 Licencia
+Desarrollado como parte del Trabajo de Fin de Máster.
 
-Este proyecto es de código abierto y está disponible para uso personal y educativo.
-
-## 🆘 Soporte
-
-Si tienes problemas con la configuración de Firebase, consulta la [documentación oficial](https://firebase.google.com/docs)
+---
+© 2026 PayTrack Project. Todos los derechos reservados.
