@@ -10,7 +10,7 @@ import { describe, it, expect } from 'vitest';
 // I will create a placeholder test file now and will update authService in the next step to export the helper.
 // For now, let's assume I'll export `getFriendlyErrorMessage` as a named export.
 
-import { getFriendlyErrorMessage } from './authService';
+import { getFriendlyErrorMessage } from '../authService';
 
 describe('authService', () => {
     describe('getFriendlyErrorMessage', () => {

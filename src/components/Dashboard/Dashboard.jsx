@@ -149,9 +149,12 @@ const Dashboard = () => {
             </header>
 
             <main className="container">
-                {showConfig && (
+                {showConfig ? (
                     <div className="config-panel card fade-in">
                         <h2>Configuración de Deuda</h2>
+                        <p className="text-muted mb-lg">
+                            Para empezar a rastrear tus pagos, primero debemos configurar el monto total de tu deuda y la cuota que planeas pagar habitualmente.
+                        </p>
                         <form onSubmit={handleSaveConfig} className="config-form">
                             <div className="form-row">
                                 <div className="form-group">
@@ -181,54 +184,67 @@ const Dashboard = () => {
                                     />
                                 </div>
                             </div>
-                            <button type="submit" className="btn btn-primary">
-                                Guardar Configuración
-                            </button>
+                            <div className="flex gap-md mt-lg">
+                                <button type="submit" className="btn btn-primary flex-1">
+                                    Guardar Configuración
+                                </button>
+                                {debtData.totalAmount > 0 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfig(false)}
+                                        className="btn btn-secondary"
+                                    >
+                                        Cancelar
+                                    </button>
+                                )}
+                            </div>
                         </form>
                     </div>
+                ) : (
+                    <div className="fade-in">
+                        {/* Section 1: Summary with chart and stats */}
+                        <PaymentChart
+                            totalDebt={debtData.totalAmount}
+                            totalPaid={totalPaid}
+                            onAddPayment={() => setShowPaymentModal(true)}
+                        />
+
+                        {/* Section 2: Quota info and actions */}
+                        <div className="quota-section card">
+                            <h2 className="chart-title">Información de Cuotas</h2>
+                            <div className="quota-info-grid">
+                                <div className="quota-info-item">
+                                    <div className="quota-info-label">Cuota Actual</div>
+                                    <div className="quota-info-value">€{adjustedQuota.toFixed(2)}</div>
+                                    {adjustedQuota !== debtData.defaultQuota && remainingAmount > 0 && (
+                                        <div className="quota-info-note">Ajustado automáticamente</div>
+                                    )}
+                                </div>
+                                <div className="quota-info-item">
+                                    <div className="quota-info-label">Cuotas Restantes</div>
+                                    <div className="quota-info-value">{remainingPayments}</div>
+                                </div>
+                            </div>
+                            <div className="quota-actions">
+                                <button
+                                    onClick={() => setShowQuotaModal(true)}
+                                    className="btn btn-primary"
+                                >
+                                    ⚙️ Modificar Cuota
+                                </button>
+                                <button
+                                    onClick={handleGenerateReport}
+                                    className="btn btn-primary"
+                                >
+                                    📤 Compartir Informe
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Section 3: Payment history */}
+                        <PaymentList payments={payments} />
+                    </div>
                 )}
-
-                {/* Section 1: Summary with chart and stats */}
-                <PaymentChart
-                    totalDebt={debtData.totalAmount}
-                    totalPaid={totalPaid}
-                    onAddPayment={() => setShowPaymentModal(true)}
-                />
-
-                {/* Section 2: Quota info and actions */}
-                <div className="quota-section card">
-                    <h2 className="chart-title">Información de Cuotas</h2>
-                    <div className="quota-info-grid">
-                        <div className="quota-info-item">
-                            <div className="quota-info-label">Cuota Actual</div>
-                            <div className="quota-info-value">€{adjustedQuota.toFixed(2)}</div>
-                            {adjustedQuota !== debtData.defaultQuota && remainingAmount > 0 && (
-                                <div className="quota-info-note">Ajustado automáticamente</div>
-                            )}
-                        </div>
-                        <div className="quota-info-item">
-                            <div className="quota-info-label">Cuotas Restantes</div>
-                            <div className="quota-info-value">{remainingPayments}</div>
-                        </div>
-                    </div>
-                    <div className="quota-actions">
-                        <button
-                            onClick={() => setShowQuotaModal(true)}
-                            className="btn btn-primary"
-                        >
-                            ⚙️ Modificar Cuota
-                        </button>
-                        <button
-                            onClick={handleGenerateReport}
-                            className="btn btn-primary"
-                        >
-                            📤 Compartir Informe
-                        </button>
-                    </div>
-                </div>
-
-                {/* Section 3: Payment history */}
-                <PaymentList payments={payments} />
             </main>
 
             {/* Modals */}

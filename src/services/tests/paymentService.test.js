@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculateRemainingPayments, calculateTotalPaid } from './paymentService';
+import { calculateRemainingPayments, calculateTotalPaid } from '../paymentService';
 
 describe('paymentService', () => {
     describe('calculateTotalPaid', () => {
