@@ -12,21 +12,26 @@ import { auth } from '../config/firebase';
 
 // Helper to get friendly error messages
 export const getFriendlyErrorMessage = (errorCode) => {
+    console.warn('Firebase Auth Error Code:', errorCode); // Log for debugging
+
     switch (errorCode) {
         case 'auth/invalid-email':
             return 'El correo electrónico no es válido.';
         case 'auth/user-disabled':
             return 'Esta cuenta ha sido deshabilitada.';
         case 'auth/user-not-found':
-            return 'No existe ninguna cuenta con este correo.';
+        case 'auth/invalid-credential':
+            return 'Credenciales incorrectas. Si te registraste con Google, usa el botón de Google para entrar.';
         case 'auth/wrong-password':
-            return 'La contraseña es incorrecta.';
+            return 'La contraseña es incorrecta. Si usas Google normalmente, intenta entrar con ese botón.';
         case 'auth/email-already-in-use':
-            return 'Ya existe una cuenta con este correo electrónico.';
+            return 'Este correo ya está registrado. Si creaste la cuenta con Google, inicia sesión con el botón de Google.';
         case 'auth/weak-password':
             return 'La contraseña es demasiado débil (mínimo 6 caracteres).';
         case 'auth/account-exists-with-different-credential':
-            return 'Ya existe una cuenta con este correo pero con otro método de acceso.';
+            return 'Existe una cuenta con este correo vinculada a Google. Por favor, inicia sesión con Google.';
+        case 'auth/credential-already-in-use':
+            return 'Esta cuenta ya está vinculada a otro usuario.';
         case 'auth/popup-closed-by-user':
             return 'Has cerrado la ventana de inicio de sesión antes de terminar.';
         case 'auth/cancelled-popup-request':
@@ -35,8 +40,11 @@ export const getFriendlyErrorMessage = (errorCode) => {
             return 'Demasiados intentos fallidos. Por favor, inténtalo más tarde.';
         case 'auth/network-request-failed':
             return 'Error de conexión. Comprueba tu internet.';
+        case 'auth/api-key-not-valid.-please-pass-a-valid-api-key.':
+        case 'auth/invalid-api-key':
+            return 'Error de configuración en la aplicación (API Key).';
         default:
-            return 'Ocurrió un error inesperado al iniciar sesión. Inténtalo de nuevo.';
+            return 'Ocurrió un error inesperado. Inténtalo de nuevo o usa otro método de acceso.';
     }
 };
 
