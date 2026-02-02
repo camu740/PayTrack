@@ -1,3 +1,7 @@
+/**
+ * Servicio para gestionar la configuración de la deuda global del usuario.
+ * Interactúa con la colección 'debts' de Firestore.
+ */
 import {
     collection,
     doc,
@@ -10,7 +14,9 @@ import { db } from '../config/firebase';
 
 const DEBTS_COLLECTION = 'debts';
 
-// Create or update debt configuration
+/**
+ * Crea o actualiza la configuración base de la deuda (Importe total y cuota ideal).
+ */
 export const createOrUpdateDebt = async (userId, totalAmount, defaultQuota) => {
     try {
         const debtRef = doc(db, DEBTS_COLLECTION, userId);
@@ -25,7 +31,9 @@ export const createOrUpdateDebt = async (userId, totalAmount, defaultQuota) => {
     }
 };
 
-// Get debt configuration
+/**
+ * Recupera la configuración de deuda de un usuario específico.
+ */
 export const getDebt = async (userId) => {
     try {
         const debtRef = doc(db, DEBTS_COLLECTION, userId);
@@ -41,7 +49,9 @@ export const getDebt = async (userId) => {
     }
 };
 
-// Update default quota
+/**
+ * Actualiza únicamente el valor de la cuota por defecto.
+ */
 export const updateDefaultQuota = async (userId, newQuota) => {
     try {
         const debtRef = doc(db, DEBTS_COLLECTION, userId);

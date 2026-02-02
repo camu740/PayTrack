@@ -1,3 +1,7 @@
+/**
+ * Servicio para gestionar las transferencias y cálculos de pagos.
+ * Interactúa con la colección 'payments' de Firestore.
+ */
 import {
     collection,
     addDoc,
@@ -10,7 +14,12 @@ import { db } from '../config/firebase';
 
 const PAYMENTS_COLLECTION = 'payments';
 
-// Add a new payment
+/**
+ * Registra un nuevo pago en el sistema.
+ * @param {string} userId - ID del usuario propietario.
+ * @param {number} amount - Importe del pago.
+ * @param {string} concept - Motivo o descripción del pago.
+ */
 export const addPayment = async (userId, amount, concept = '') => {
     try {
         const paymentsRef = collection(db, PAYMENTS_COLLECTION);
@@ -26,7 +35,11 @@ export const addPayment = async (userId, amount, concept = '') => {
     }
 };
 
-// Get all payments for a user
+/**
+ * Recupera el historial completo de pagos de un usuario.
+ * @param {string} userId - ID del usuario.
+ * @returns {Promise<{data: Array, error: string|null}>}
+ */
 export const getPayments = async (userId) => {
     try {
         const paymentsRef = collection(db, PAYMENTS_COLLECTION);
@@ -43,22 +56,25 @@ export const getPayments = async (userId) => {
             payments.push({
                 id: doc.id,
                 ...data,
-                // Convert Firestore Timestamp to JS Date, or use current date if null
+                // Conversión de Timestamp de Firestore a Date de JS
                 createdAt: data.createdAt?.toDate() || new Date()
             });
         });
 
-        // Sort by date on client side (newest first)
+        // Ordenación cronológica descendente (más reciente primero)
         payments.sort((a, b) => b.createdAt - a.createdAt);
 
         return { data: payments, error: null };
     } catch (error) {
-        console.error('Error getting payments:', error);
+        console.error('Error al recuperar pagos:', error);
         return { data: [], error: error.message };
     }
 };
 
-// Calculate remaining payments
+/**
+ * Calcula el estado de la deuda (cuotas restantes, montos pendientes y ajuste de cuota).
+ * Lógica central del motor de pagos.
+ */
 export const calculateRemainingPayments = (totalDebt, totalPaid, defaultQuota) => {
     const remaining = totalDebt - totalPaid;
 
@@ -66,7 +82,7 @@ export const calculateRemainingPayments = (totalDebt, totalPaid, defaultQuota) =
         return { remainingAmount: 0, remainingPayments: 0, adjustedQuota: 0 };
     }
 
-    // If remaining is less than default quota, adjust quota
+    // Ajuste automático: si lo que queda es menor que la cuota habitual, la cuota final se ajusta.
     const adjustedQuota = remaining < defaultQuota ? remaining : defaultQuota;
     const remainingPayments = Math.ceil(remaining / adjustedQuota);
 
@@ -77,7 +93,9 @@ export const calculateRemainingPayments = (totalDebt, totalPaid, defaultQuota) =
     };
 };
 
-// Calculate total paid from payments array
+/**
+ * Suma el total de todos los pagos realizados.
+ */
 export const calculateTotalPaid = (payments) => {
     return payments.reduce((total, payment) => total + payment.amount, 0);
 };
