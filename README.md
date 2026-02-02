@@ -1,6 +1,6 @@
 # PayTrack - Plataforma de Gestión y Seguimiento de Pagos
 
-**PayTrack** es una aplicación web progresiva (PWA) diseñada para facilitar el control financiero personal, específicamente orientada a la gestión y amortización de deudas o pagos recurrentes. Este proyecto ha sido desarrollado como parte de un Trabajo de Fin de Grado (TFG), demostrando el uso de arquitecturas modernas en el desarrollo web.
+**PayTrack** es una aplicación web progresiva (PWA) diseñada para facilitar el control financiero personal, específicamente orientada a la gestión y amortización de deudas o pagos recurrentes. Este proyecto ha sido desarrollado como parte de un Trabajo de Fin de Master (TFM), demostrando el uso de arquitecturas modernas en el desarrollo web.
 
 ## 📌 Descripción del Proyecto
 
@@ -139,21 +139,65 @@ npm run dev
 
 La aplicación estará accesible en: `http://localhost:5173`
 
-## 📦 Construcción y Despliegue
 
-Para generar una versión optimizada para producción:
+### 5. Ejecutar Tests (Pruebas)
+
+El proyecto incluye una batería de tests unitarios para verificar la lógica de negocio y los servicios de autenticación.
 
 ```bash
-npm run build
+npm test
 ```
 
-Esto generará la carpeta `dist/` con los archivos estáticos listos para ser servidos.
+Esto ejecutará **Vitest** y mostrará los resultados de las pruebas definidas en `src/services/*.test.js`.
 
-Para desplegar directamente a Firebase Hosting (si tienes Firebase CLI instalado):
+## 📦 Despliegue en Producción (Firebase Hosting)
+
+Para llevar tu proyecto a internet usando Firebase Hosting, sigue estos pasos:
+
+### 1. Instalar Firebase CLI
+Si es tu primera vez desplegando, necesitas las herramientas de línea de comandos de Firebase.
 
 ```bash
+npm install -g firebase-tools
+```
+
+### 2. Iniciar Sesión en Firebase
+Conecta tu terminal con tu cuenta de Google:
+
+```bash
+firebase login
+```
+
+Esto abrirá una ventana en tu navegador para que autorices el acceso.
+
+### 3. Inicializar el Proyecto
+Configura el proyecto para hosting (solo necesario la primera vez):
+
+```bash
+firebase init hosting
+```
+
+El asistente te hará varias preguntas. Responde lo siguiente:
+1.  **¿Estás listo para proceder?**: `Y` (Sí).
+2.  **Select option**: `Use an existing project` (Usar un proyecto existente).
+3.  **Selecciona tu proyecto**: Busca `paytrack` en la lista.
+4.  **What do you want to use as your public directory?**: `dist` (Muy importante: escribe **dist**).
+5.  **Configure as a single-page app?**: `Y` (Sí).
+6.  **Set up automatic builds and deploys with GitHub?**: `N` (No, por ahora).
+
+### 4. Generar Versión de Producción y Desplegar
+
+Cada vez que quieras subir cambios, ejecuta estos dos comandos:
+
+```bash
+# 1. Construye el proyecto (genera la carpeta dist)
+npm run build
+
+# 2. Sube los archivos a internet
 firebase deploy
 ```
+
+Al finalizar, la terminal te mostrará la **Hosting URL** donde tu aplicación está visible para todo el mundo.
 
 ## 🔐 Seguridad y Privacidad
 
@@ -164,7 +208,7 @@ Este proyecto implementa reglas de seguridad en nivel de base de datos (Firestor
 
 ## 👤 Autor
 
-Desarrollado como parte del Trabajo de Fin de Máster.
+Desarrollado como parte del Trabajo de Fin de Máster en desarrollo de IA de Brais Moure en BIG SCHOOl.
 
 ---
 © 2026 PayTrack Project. Todos los derechos reservados.

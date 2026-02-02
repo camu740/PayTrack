@@ -15,6 +15,11 @@ export default defineConfig({
           'charts': ['recharts']
         }
       }
+    },
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      css: true
     }
   }
 })

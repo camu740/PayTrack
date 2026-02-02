@@ -11,7 +11,7 @@ import {
 import { auth } from '../config/firebase';
 
 // Helper to get friendly error messages
-const getFriendlyErrorMessage = (errorCode) => {
+export const getFriendlyErrorMessage = (errorCode) => {
     switch (errorCode) {
         case 'auth/invalid-email':
             return 'El correo electrónico no es válido.';
